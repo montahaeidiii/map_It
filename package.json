@@ -12,7 +12,7 @@
   "dependencies": {
     "@react-leaflet/core": "^3.0.0",
     "@supabase/postgrest-js": "^1.21.4",
-    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/supabase-js": "^2.78.0",
     "@types/leaflet-draw": "^1.0.13",
     "@types/uuid": "^10.0.0",
     "leaflet": "^1.9.4",
