@@ -18,15 +18,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const path = req.url.replace('/api/customer', '');
-    const match = path.match(/^\/(\d+)\/(maps|package)$/);
+    // In Vercel, URL will be like /api/customer/27/maps or /api/customer/27/package
+    const urlPath = req.url || '';
+    const match = urlPath.match(/\/customer\/(\d+)\/(maps|package)/);
 
     if (!match) {
-      return res.status(400).json({ success: false, error: 'Invalid path' });
+      return res.status(400).json({ success: false, error: 'Invalid path format. Use /api/customer/:id/maps or /api/customer/:id/package' });
     }
 
     const [, customerId, endpoint] = match;
     const customer_id = parseInt(customerId, 10);
+    
+    console.log('[Customer API] ID:', customer_id, 'Endpoint:', endpoint);
 
     // Route: /api/customer/:id/maps
     if (endpoint === 'maps') {

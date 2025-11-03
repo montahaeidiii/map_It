@@ -1,5 +1,5 @@
 // Consolidated admin endpoints - all admin routes in one file
-import pool from '../_db.js';
+import pool from './_db.js';
 import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {
@@ -14,11 +14,17 @@ export default async function handler(req, res) {
     return;
   }
 
-  const path = req.url.replace('/api/admin', '');
+  // In Vercel, the URL will be like /api/admin/login, /api/admin/maps, etc.
+  // Extract the path after /admin/
+  const urlPath = req.url || '';
+  const pathMatch = urlPath.match(/\/admin\/(.+?)(?:\?|$)/);
+  const endpoint = pathMatch ? pathMatch[1] : '';
+  
+  console.log('[Admin API] Endpoint:', endpoint, 'Method:', req.method);
 
   try {
     // Route: /api/admin/login
-    if (path === '/login' && req.method === 'POST') {
+    if (endpoint === 'login' && req.method === 'POST') {
       const { email, password } = req.body;
       if (!email || !password) {
         return res.status(400).json({ success: false, error: 'Email and password required' });
@@ -54,7 +60,7 @@ export default async function handler(req, res) {
     }
 
     // Route: /api/admin/maps
-    if (path === '/maps' && req.method === 'GET') {
+    if (endpoint === 'maps' && req.method === 'GET') {
       const result = await pool.query(`
         SELECT 
           m.map_id,
@@ -80,7 +86,7 @@ export default async function handler(req, res) {
     }
 
     // Route: /api/admin/orders
-    if (path === '/orders' && req.method === 'GET') {
+    if (endpoint === 'orders' && req.method === 'GET') {
       const result = await pool.query(`
         SELECT 
           o.id,
@@ -104,7 +110,7 @@ export default async function handler(req, res) {
     }
 
     // Route: /api/admin/stats
-    if (path === '/stats' && req.method === 'GET') {
+    if (endpoint === 'stats' && req.method === 'GET') {
       const [customers, maps, zones, orders, revenue, activeMaps] = await Promise.all([
         pool.query('SELECT COUNT(*) as count FROM customer'),
         pool.query('SELECT COUNT(*) as count FROM map'),

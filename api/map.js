@@ -14,12 +14,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const path = req.url.replace('/api/map', '');
+    // In Vercel, URL will be like /api/map/36/zones or /api/map/36 or /api/map
+    const urlPath = req.url || '';
     
     // Route: /api/map/:id/zones
-    const zonesMatch = path.match(/^\/(\d+)\/zones$/);
+    const zonesMatch = urlPath.match(/\/map\/(\d+)\/zones/);
     if (zonesMatch) {
       const map_id = parseInt(zonesMatch[1], 10);
+      console.log('[Map API] Getting zones for map:', map_id);
       
       const result = await pool.query(`
         SELECT id, map_id, name, color, coordinates, created_at
@@ -35,9 +37,10 @@ export default async function handler(req, res) {
     }
 
     // Route: /api/map/:id (GET single map)
-    const idMatch = path.match(/^\/(\d+)$/);
+    const idMatch = urlPath.match(/\/map\/(\d+)(?:$|\?)/);
     if (idMatch && req.method === 'GET') {
       const map_id = parseInt(idMatch[1], 10);
+      console.log('[Map API] Getting map:', map_id);
 
       const mapResult = await pool.query(`
         SELECT 
@@ -69,7 +72,8 @@ export default async function handler(req, res) {
     }
 
     // Route: /api/map (POST - create new map)
-    if (path === '' && req.method === 'POST') {
+    if (!idMatch && !zonesMatch && req.method === 'POST') {
+      console.log('[Map API] Creating new map');
       const { title, description, country, customer_id, map_code, map_data, map_bounds } = req.body;
 
       if (!title || !customer_id) {
