@@ -1,0 +1,12 @@
+# Ignore catch-all routes that conflict with specific routes
+api/customer/[...path].js
+api/admin/[...path].js
+api/zones/[...path].js
+api/map/[...path].js
+
+# Ignore history folder
+.history/
+
+# Ignore local environment files
+.env
+.env.local
